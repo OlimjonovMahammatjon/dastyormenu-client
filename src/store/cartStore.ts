@@ -5,8 +5,8 @@ import { CartItem, MenuItem } from '../types'
 interface CartStore {
   items: CartItem[]
   addItem: (menuItem: MenuItem, modifications?: string) => void
-  removeItem: (menuItemId: string) => void
-  updateQuantity: (menuItemId: string, quantity: number) => void
+  removeItem: (menuItemId: string, modifications?: string) => void
+  updateQuantity: (menuItemId: string, modifications: string | undefined, quantity: number) => void
   clearCart: () => void
   getTotal: () => number
   getItemCount: () => number
@@ -39,21 +39,25 @@ export const useCartStore = create<CartStore>()(
         })
       },
 
-      removeItem: (menuItemId) => {
+      removeItem: (menuItemId, modifications) => {
         set((state) => ({
-          items: state.items.filter((item) => item.menuItem.id !== menuItemId)
+          items: state.items.filter(
+            (item) => !(item.menuItem.id === menuItemId && item.modifications === modifications)
+          )
         }))
       },
 
-      updateQuantity: (menuItemId, quantity) => {
+      updateQuantity: (menuItemId, modifications, quantity) => {
         if (quantity <= 0) {
-          get().removeItem(menuItemId)
+          get().removeItem(menuItemId, modifications)
           return
         }
 
         set((state) => ({
           items: state.items.map((item) =>
-            item.menuItem.id === menuItemId ? { ...item, quantity } : item
+            item.menuItem.id === menuItemId && item.modifications === modifications
+              ? { ...item, quantity }
+              : item
           )
         }))
       },

@@ -2,6 +2,7 @@ import { MenuItem } from '../../../types'
 import { BottomSheet } from '../ui/bottom-sheet'
 import { Clock, Plus, Minus } from 'lucide-react'
 import { useState } from 'react'
+import { formatPrice } from '../../../lib/utils'
 
 interface DishModalProps {
   dish: MenuItem | null
@@ -15,10 +16,6 @@ export function DishModal({ dish, open, onOpenChange, onAddToCart }: DishModalPr
   const [modifications, setModifications] = useState('')
 
   if (!dish) return null
-
-  const formatPrice = (price: number) => {
-    return (price / 100).toLocaleString('uz-UZ') + " so'm"
-  }
 
   const handleAddToCart = () => {
     onAddToCart(dish, quantity, modifications || undefined)
@@ -80,14 +77,16 @@ export function DishModal({ dish, open, onOpenChange, onAddToCart }: DishModalPr
           <div className="flex items-center gap-3">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-text hover:border-gold/50 transition-colors"
+              aria-label="Miqdorni kamaytirish"
+              className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-text hover:border-gold/50 transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="text-text w-8 text-center">{quantity}</span>
+            <span className="text-text w-8 text-center" aria-label={`Miqdor: ${quantity}`}>{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="w-8 h-8 rounded-full bg-gold flex items-center justify-center hover:bg-gold-hover transition-colors"
+              aria-label="Miqdorni oshirish"
+              className="w-8 h-8 rounded-full bg-gold flex items-center justify-center hover:bg-gold-hover transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
             >
               <Plus className="w-4 h-4" style={{ color: 'var(--bg)' }} />
             </button>
@@ -97,7 +96,8 @@ export function DishModal({ dish, open, onOpenChange, onAddToCart }: DishModalPr
         <button
           onClick={handleAddToCart}
           disabled={!dish.is_available}
-          className="w-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed text-bg py-4 rounded-[var(--radius-btn)] transition-colors flex items-center justify-center gap-2"
+          aria-label={`${dish.name}ni savatga qo'shish`}
+          className="w-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed text-bg py-4 rounded-[var(--radius-btn)] transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
           style={{
             boxShadow: dish.is_available ? 'var(--shadow-gold)' : 'none'
           }}

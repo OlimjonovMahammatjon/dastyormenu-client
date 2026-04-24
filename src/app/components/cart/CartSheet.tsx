@@ -3,6 +3,7 @@ import { useCartStore } from '../../../store/cartStore'
 import { Trash2, Plus, Minus } from 'lucide-react'
 import { useState } from 'react'
 import confetti from 'canvas-confetti'
+import { formatPrice } from '../../../lib/utils'
 
 interface CartSheetProps {
   open: boolean
@@ -19,20 +20,19 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
   const [tipPercentage, setTipPercentage] = useState(0)
   const [note, setNote] = useState('')
 
-  const formatPrice = (price: number) => {
-    return (price / 100).toLocaleString('uz-UZ') + " so'm"
-  }
-
   const tipAmount = (total * tipPercentage) / 100
   const grandTotal = total + tipAmount
 
   const handleCheckout = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#FFB800', '#E6A500', '#FFF8E1']
-    })
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!prefersReducedMotion) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FFB800', '#E6A500', '#FFF8E1']
+      })
+    }
     onCheckout(tipPercentage, note || undefined)
   }
 
@@ -75,23 +75,26 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
 
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                 <button
-                  onClick={() => removeItem(item.menuItem.id)}
-                  className="text-text-muted hover:text-red-500 transition-colors"
+                  onClick={() => removeItem(item.menuItem.id, item.modifications)}
+                  aria-label={`${item.menuItem.name}ni o'chirish`}
+                  className="text-text-muted hover:text-red-500 transition-colors p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
 
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => updateQuantity(item.menuItem.id, item.quantity - 1)}
-                    className="w-7 h-7 rounded-full bg-surface border border-border flex items-center justify-center text-text hover:border-gold/50 transition-colors"
+                    onClick={() => updateQuantity(item.menuItem.id, item.modifications, item.quantity - 1)}
+                    aria-label="Miqdorni kamaytirish"
+                    className="w-7 h-7 rounded-full bg-surface border border-border flex items-center justify-center text-text hover:border-gold/50 transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
                   >
                     <Minus className="w-3 h-3" />
                   </button>
-                  <span className="text-text w-6 text-center">{item.quantity}</span>
+                  <span className="text-text w-6 text-center" aria-label={`Miqdor: ${item.quantity}`}>{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.menuItem.id, item.quantity + 1)}
-                    className="w-7 h-7 rounded-full bg-gold flex items-center justify-center hover:bg-gold-hover transition-colors"
+                    onClick={() => updateQuantity(item.menuItem.id, item.modifications, item.quantity + 1)}
+                    aria-label="Miqdorni oshirish"
+                    className="w-7 h-7 rounded-full bg-gold flex items-center justify-center hover:bg-gold-hover transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
                   >
                     <Plus className="w-3 h-3" style={{ color: 'var(--bg)' }} />
                   </button>
@@ -108,7 +111,9 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
               <button
                 key={percentage}
                 onClick={() => setTipPercentage(percentage)}
-                className="flex-1 py-2 rounded-lg text-sm transition-colors"
+                aria-label={`Xizmat haqqi ${percentage === 0 ? "yo'q" : percentage + ' foiz'}`}
+                aria-pressed={tipPercentage === percentage}
+                className="flex-1 py-2 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
                 style={{
                   background: tipPercentage === percentage ? 'var(--gold)' : 'var(--surface)',
                   color: tipPercentage === percentage ? 'var(--bg)' : 'var(--text-muted)'
@@ -150,7 +155,8 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
 
         <button
           onClick={handleCheckout}
-          className="w-full bg-gold hover:bg-gold-hover text-bg py-4 rounded-[var(--radius-btn)] transition-colors"
+          aria-label="Buyurtma berish"
+          className="w-full bg-gold hover:bg-gold-hover text-bg py-4 rounded-[var(--radius-btn)] transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
           style={{
             boxShadow: 'var(--shadow-gold)'
           }}

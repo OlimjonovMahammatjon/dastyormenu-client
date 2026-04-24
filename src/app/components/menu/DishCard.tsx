@@ -1,6 +1,8 @@
 import { MenuItem } from '../../../types'
 import { Clock, Plus } from 'lucide-react'
 import { motion } from 'motion/react'
+import { formatPrice } from '../../../lib/utils'
+import { ImageWithFallback } from '../figma/ImageWithFallback'
 
 interface DishCardProps {
   dish: MenuItem
@@ -9,9 +11,6 @@ interface DishCardProps {
 }
 
 export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
-  const formatPrice = (price: number) => {
-    return (price / 100).toLocaleString('uz-UZ') + " so'm"
-  }
 
   return (
     <motion.div
@@ -26,18 +25,15 @@ export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
       }}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
-        {dish.image_url ? (
-          <img
-            src={dish.image_url}
-            alt={dish.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-4xl">🍽️</div>
-        )}
+        <ImageWithFallback
+          src={dish.image_url}
+          alt={dish.name}
+          fallback="🍽️"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
         {!dish.is_available && (
-          <div className="absolute inset-0 bg-bg/80 flex items-center justify-center">
-            <span className="text-text-muted text-sm px-4 py-2 bg-surface rounded-full">
+          <div className="absolute inset-0 bg-bg/80 backdrop-blur-sm flex items-center justify-center">
+            <span className="text-text-muted text-sm px-4 py-2 bg-surface rounded-full border border-border">
               Vaqtinchalik mavjud emas
             </span>
           </div>
@@ -62,7 +58,8 @@ export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
           <button
             onClick={onAddToCart}
             disabled={!dish.is_available}
-            className="w-10 h-10 rounded-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+            aria-label={`${dish.name}ni savatga qo'shish`}
+            className="w-10 h-10 rounded-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
             style={{
               boxShadow: dish.is_available ? 'var(--shadow-gold)' : 'none'
             }}

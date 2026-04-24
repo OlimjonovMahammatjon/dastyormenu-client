@@ -14,13 +14,14 @@ export function HeroHeader({ organization, table }: HeroHeaderProps) {
           {organization.logo_url && (
             <img
               src={organization.logo_url}
-              alt={organization.name}
+              alt={`${organization.name} logotipi`}
               className="w-16 h-16 rounded-xl object-cover border-2 border-gold/20"
+              loading="lazy"
             />
           )}
           <div className="flex-1">
             <h1 className="font-display text-2xl text-text mb-1">{organization.name}</h1>
-            <div className="text-gold text-sm">Stol #{table.table_number}</div>
+            <div className="text-gold text-sm" role="status">Stol #{table.table_number}</div>
           </div>
         </div>
 
@@ -28,14 +29,18 @@ export function HeroHeader({ organization, table }: HeroHeaderProps) {
           <div className="space-y-2 text-sm text-text-muted">
             {organization.address && (
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <span>{organization.address}</span>
               </div>
             )}
             {organization.phone && (
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 flex-shrink-0" />
-                <a href={`tel:${organization.phone}`} className="hover:text-gold transition-colors">
+                <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                <a
+                  href={`tel:${organization.phone}`}
+                  className="hover:text-gold transition-colors focus:outline-none focus:underline"
+                  aria-label={`Telefon raqami: ${organization.phone}`}
+                >
                   {organization.phone}
                 </a>
               </div>

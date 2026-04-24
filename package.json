@@ -4,8 +4,12 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "dev": "vite",
     "build": "vite build",
-    "dev": "vite"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
