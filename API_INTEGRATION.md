@@ -164,7 +164,14 @@ pending → cooking → ready → completed
 
 ## 🔐 Authentication
 
-Hozircha authentication talab qilinmaydi. Kelajakda Bearer token qo'shilishi mumkin.
+**API public** - Authentication talab qilinmaydi! ✅
+
+Barcha endpoint'lar token'siz ishlaydi. Faqat quyidagi header'lar kerak:
+
+```
+Accept: application/json
+Content-Type: application/json
+```
 
 ## 🚀 Usage in Code
 
@@ -213,7 +220,10 @@ const tableId = getTableIdFromURL()
 
 ```env
 VITE_API_URL=https://dastyormenu-backend-production.up.railway.app/api
+VITE_APP_NAME=Dastyor
 ```
+
+**Eslatma:** API token talab qilmaydi.
 
 ## ⚠️ Error Handling
 
@@ -286,16 +296,25 @@ curl https://dastyormenu-backend-production.up.railway.app/api/tables/711efdee-e
 ## 🐛 Common Issues
 
 ### 404 Not Found
-- Table ID noto'g'ri yoki mavjud emas
-- UUID formatini tekshiring
+- **Sabab:** Table ID noto'g'ri yoki mavjud emas
+- **Yechim:** 
+  1. UUID formatini tekshiring (36 belgi, 8-4-4-4-12)
+  2. QR kodni qayta skanerlang
+  3. Backend'da table mavjudligini tekshiring
 
 ### Network Error
-- Internet aloqasini tekshiring
-- API server ishlab turganini tekshiring
+- **Sabab:** Internet aloqasi yo'q yoki API server ishlamayapti
+- **Yechim:**
+  1. Internet aloqasini tekshiring
+  2. API server statusini tekshiring: `curl https://dastyormenu-backend-production.up.railway.app/api/`
+  3. Firewall/VPN tekshiring
 
 ### CORS Error
-- Backend CORS sozlamalari to'g'ri ekanligini tekshiring
-- Vercel domain whitelist'da bo'lishi kerak
+- **Sabab:** Backend CORS sozlamalari noto'g'ri
+- **Yechim:**
+  1. Backend CORS sozlamalarini tekshiring
+  2. Vercel domain whitelist'da bo'lishi kerak
+  3. Backend team bilan bog'laning
 
 ---
 

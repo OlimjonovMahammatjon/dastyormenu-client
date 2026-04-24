@@ -42,38 +42,58 @@ export function MenuPage() {
   // Load data
   useEffect(() => {
     async function loadData() {
-      if (!tableId) {
-        setError('Table ID topilmadi. QR kodni qayta skanerlang.')
-        setLoading(false)
-        return
-      }
-
       try {
         setLoading(true)
         setError(null)
 
-        // Load table info
-        const tableData = await api.getTable(tableId)
-        setTable(tableData)
+        console.log('📱 Loading data...')
 
-        // Store table ID for orders
-        localStorage.setItem('currentTableId', tableId)
+        // Try to load table info if tableId exists
+        if (tableId) {
+          try {
+            const tableData = await api.getTable(tableId)
+            console.log('✅ Table loaded:', tableData)
+            setTable(tableData)
+            localStorage.setItem('currentTableId', tableId)
 
-        // Load organization info
-        const orgData = await api.getOrganization(tableData.organization_id)
-        setOrganization(orgData)
+            // Load organization info
+            const orgId = tableData.organization || tableData.organization_id
+            if (orgId) {
+              try {
+                const orgData = await api.getOrganization(orgId)
+                console.log('✅ Organization loaded:', orgData)
+                setOrganization(orgData)
+              } catch (orgErr) {
+                console.warn('⚠️ Organization not loaded, using defaults')
+              }
+            }
+          } catch (tableErr) {
+            console.warn('⚠️ Table not loaded, continuing without table info')
+          }
+        }
 
-        // Load categories
-        const categoriesData = await api.getCategories(tableData.organization_id)
-        setCategories(categoriesData)
+        // Always try to load menu items (even without table)
+        try {
+          const menuData = await api.getMenuItems({ is_available: true })
+          console.log('✅ Menu items loaded:', menuData.results.length)
+          setMenuItems(menuData.results)
+        } catch (menuErr) {
+          console.error('❌ Failed to load menu items:', menuErr)
+          throw new Error('Menyu yuklanmadi')
+        }
 
-        // Load menu items
-        const menuData = await api.getMenuItems({ is_available: true })
-        setMenuItems(menuData.results)
+        // Try to load categories
+        try {
+          const categoriesData = await api.getCategories()
+          console.log('✅ Categories loaded:', categoriesData.length)
+          setCategories(categoriesData)
+        } catch (catErr) {
+          console.warn('⚠️ Categories not loaded, continuing without categories')
+        }
 
       } catch (err) {
-        console.error('Error loading data:', err)
-        setError(err instanceof Error ? err.message : 'Ma\'lumotlarni yuklashda xatolik')
+        console.error('❌ Error loading data:', err)
+        setError('Menyu yuklanmadi. Iltimos, qayta urinib ko\'ring.')
       } finally {
         setLoading(false)
       }
@@ -83,7 +103,10 @@ export function MenuPage() {
   }, [tableId])
 
   const filteredDishes = activeCategory
-    ? menuItems.filter((item) => item.category_id === activeCategory)
+    ? menuItems.filter((item) => {
+        const catId = item.category_id || item.category_name
+        return catId === activeCategory
+      })
     : menuItems
 
   const handleDishClick = (dish: MenuItem) => {
@@ -177,19 +200,26 @@ export function MenuPage() {
     )
   }
 
-  // Error state
-  if (error || !table || !organization) {
+  // Error state - faqat menu yuklanmasa
+  if (error && menuItems.length === 0) {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-surface rounded-[var(--radius-card)] p-8 border border-border text-center">
-          <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-          <h2 className="text-xl text-text mb-3">Xatolik yuz berdi</h2>
-          <p className="text-text-muted mb-6">
-            {error || 'Ma\'lumotlarni yuklashda xatolik yuz berdi'}
+          <div className="text-6xl mb-6" role="img" aria-label="Xatolik">😕</div>
+          
+          <h2 className="text-2xl text-text mb-4 font-display">
+            Kechirasiz!
+          </h2>
+          
+          <p className="text-text-muted text-lg mb-8">
+            Menyu yuklanmadi.
+            <br />
+            Iltimos, qayta urinib ko'ring.
           </p>
+          
           <button
             onClick={() => window.location.reload()}
-            className="w-full bg-gold hover:bg-gold-hover text-bg py-3 px-6 rounded-[var(--radius-btn)] transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
+            className="w-full bg-gold hover:bg-gold-hover text-bg py-4 px-6 rounded-[var(--radius-btn)] transition-colors focus:outline-none focus:ring-2 focus:ring-gold text-lg font-medium"
             style={{ boxShadow: 'var(--shadow-gold)' }}
           >
             Qayta urinish
@@ -199,9 +229,30 @@ export function MenuPage() {
     )
   }
 
+  // Default organization if not loaded
+  const displayOrg = organization || {
+    id: 'default',
+    name: 'Dastyor Restaurant',
+    logo_url: undefined,
+    address: undefined,
+    phone: undefined
+  }
+
+  // Default table if not loaded
+  const displayTable = table || {
+    id: tableId || 'default',
+    organization_id: 'default',
+    organization: 'default',
+    table_number: 0,
+    qr_code_image: undefined,
+    qr_code_url: undefined,
+    assigned_waiter: null,
+    waiter_name: null
+  }
+
   return (
     <div className="min-h-screen bg-bg pb-32">
-      <HeroHeader organization={organization} table={table} />
+      <HeroHeader organization={displayOrg} table={displayTable} />
       <FilterBar
         categories={categories}
         activeCategory={activeCategory}

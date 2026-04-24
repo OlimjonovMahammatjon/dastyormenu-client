@@ -28,9 +28,8 @@ Modern va interaktiv restoran menyu ilovasi. QR kod orqali mijozlar menyuni ko'r
 # Dependencylarni o'rnatish
 npm install
 
-# Environment variables sozlash
+# Environment variables sozlash (ixtiyoriy)
 cp .env.example .env
-# .env faylida VITE_API_URL ni sozlang
 
 # Development serverini ishga tushirish
 npm run dev
