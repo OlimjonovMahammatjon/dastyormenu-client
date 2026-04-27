@@ -18,54 +18,71 @@ export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="bg-surface rounded-[var(--radius-card)] overflow-hidden border border-border/50 hover:border-gold/30 transition-all cursor-pointer group"
+      whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(245, 158, 11, 0.25)' }}
+      className="bg-white rounded-xl overflow-hidden border-2 border-gray-100 hover:border-gold transition-all cursor-pointer group relative shadow-md"
       onClick={onClick}
-      style={{
-        boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-      }}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-surface-2 to-surface">
         <ImageWithFallback
           src={dish.image_url}
           alt={dish.name}
           fallback="🍽️"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
         {!dish.is_available && (
-          <div className="absolute inset-0 bg-bg/80 backdrop-blur-sm flex items-center justify-center">
-            <span className="text-text-muted text-sm px-4 py-2 bg-surface rounded-full border border-border">
-              Vaqtinchalik mavjud emas
-            </span>
+          <div className="absolute inset-0 bg-bg/95 flex items-center justify-center">
+            <div className="text-center">
+              <span className="text-text-muted text-sm px-6 py-3 bg-surface rounded-full border-2 border-border">
+                Vaqtinchalik mavjud emas
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {/* Badge for new items */}
+        {dish.is_available && (
+          <div className="absolute top-3 right-3 bg-gold text-bg text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg">
+            Yangi
           </div>
         )}
       </div>
 
-      <div className="p-4">
-        <h3 className="text-text text-lg mb-1">{dish.name}</h3>
+      <div className="p-5">
+        <h3 className="text-text text-lg font-semibold mb-2 line-clamp-1 group-hover:text-gold transition-colors">
+          {dish.name}
+        </h3>
+        
         {dish.description && (
-          <p className="text-text-muted text-sm mb-3 line-clamp-2">{dish.description}</p>
+          <p className="text-text-muted text-sm mb-4 line-clamp-2 leading-relaxed">
+            {dish.description}
+          </p>
         )}
 
         <div className="flex items-center justify-between">
-          <div>
-            <div className="text-gold text-xl">{formatPrice(dish.price)}</div>
-            <div className="flex items-center gap-1 text-text-muted text-xs mt-1">
-              <Clock className="w-3 h-3" />
+          <div className="flex-1">
+            <div className="text-gold text-2xl font-bold mb-1">
+              {formatPrice(dish.price)}
+            </div>
+            <div className="flex items-center gap-1.5 text-text-muted text-xs">
+              <Clock className="w-3.5 h-3.5" />
               <span>{dish.cook_time_minutes} daqiqa</span>
             </div>
           </div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={onAddToCart}
             disabled={!dish.is_available}
             aria-label={`${dish.name}ni savatga qo'shish`}
-            className="w-10 h-10 rounded-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
-            style={{
-              boxShadow: dish.is_available ? 'var(--shadow-gold)' : 'none'
-            }}
+            className="w-11 h-11 rounded-lg bg-gold hover:bg-gold-hover disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
           >
-            <Plus className="w-5 h-5" style={{ color: dish.is_available ? 'var(--bg)' : 'var(--text-muted)' }} />
-          </button>
+            <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
+          </motion.button>
         </div>
       </div>
     </motion.div>

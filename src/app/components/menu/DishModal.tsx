@@ -3,6 +3,7 @@ import { BottomSheet } from '../ui/bottom-sheet'
 import { Clock, Plus, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { formatPrice } from '../../../lib/utils'
+import { motion } from 'motion/react'
 
 interface DishModalProps {
   dish: MenuItem | null
@@ -28,83 +29,95 @@ export function DishModal({ dish, open, onOpenChange, onAddToCart }: DishModalPr
 
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange}>
-      <div className="space-y-6 pb-6">
-        {dish.image_url && (
-          <div className="relative -mx-6 -mt-4 aspect-[16/10] overflow-hidden bg-surface-2">
-            <img
-              src={dish.image_url}
-              alt={dish.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-
-        <div>
-          <h2 className="text-2xl text-text mb-2">{dish.name}</h2>
+      <div className="flex flex-col gap-5 pb-6">
+        {/* Dish Info */}
+        <div className="flex flex-col gap-3">
+          <h2 className="text-2xl font-bold text-text">{dish.name}</h2>
           {dish.description && (
-            <p className="text-text-muted mb-4">{dish.description}</p>
+            <p className="text-text-muted text-sm leading-relaxed">{dish.description}</p>
           )}
-
-          <div className="flex items-center gap-3 text-sm">
-            <div className="flex items-center gap-1 text-text-muted">
-              <Clock className="w-4 h-4" />
-              <span>{dish.cook_time_minutes} daqiqa</span>
+          
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-2 rounded-lg border border-border">
+              <Clock className="w-4 h-4 text-gold" />
+              <span className="text-text-muted text-sm">{dish.cook_time_minutes} daqiqa</span>
             </div>
-            <div className="text-gold text-xl">{formatPrice(dish.price)}</div>
+            <div className="text-gold text-2xl font-bold">{formatPrice(dish.price)}</div>
           </div>
         </div>
 
+        {/* Ingredients */}
         {dish.ingredients && (
-          <div>
-            <h3 className="text-text mb-2">Tarkibi:</h3>
-            <p className="text-text-muted text-sm">{dish.ingredients}</p>
+          <div className="bg-surface-2 rounded-lg p-4 border border-border">
+            <h3 className="text-text font-semibold mb-2 text-sm">Tarkibi:</h3>
+            <p className="text-text-muted text-sm leading-relaxed">{dish.ingredients}</p>
           </div>
         )}
 
-        <div>
-          <label className="block text-text mb-2">Qo'shimcha izohlar (ixtiyoriy):</label>
+        {/* Modifications */}
+        <div className="flex flex-col gap-2">
+          <label className="text-text font-semibold text-sm">
+            Qo'shimcha izohlar (ixtiyoriy):
+          </label>
           <textarea
             value={modifications}
             onChange={(e) => setModifications(e.target.value)}
             placeholder="Masalan: achchiq qo'shmasangiz..."
-            className="w-full bg-surface-2 border border-border rounded-xl px-4 py-3 text-text placeholder:text-text-muted resize-none focus:outline-none focus:border-gold/50"
+            className="w-full bg-surface-2 border border-border rounded-lg px-3 py-2.5 text-text text-sm placeholder:text-text-muted resize-none focus:outline-none focus:border-gold transition-colors"
             rows={3}
           />
         </div>
 
-        <div className="flex items-center justify-between bg-surface-2 rounded-xl p-4">
-          <span className="text-text">Miqdori:</span>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              aria-label="Miqdorni kamaytirish"
-              className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-text hover:border-gold/50 transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-            <span className="text-text w-8 text-center" aria-label={`Miqdor: ${quantity}`}>{quantity}</span>
-            <button
-              onClick={() => setQuantity(quantity + 1)}
-              aria-label="Miqdorni oshirish"
-              className="w-8 h-8 rounded-full bg-gold flex items-center justify-center hover:bg-gold-hover transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
-            >
-              <Plus className="w-4 h-4" style={{ color: 'var(--bg)' }} />
-            </button>
+        {/* Quantity Selector */}
+        <div className="bg-surface-2 rounded-lg p-4 border border-border">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-text font-semibold text-sm">Miqdori:</span>
+            <div className="flex items-center gap-3">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                aria-label="Miqdorni kamaytirish"
+                className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center text-text hover:border-gold hover:bg-gold/10 transition-colors"
+              >
+                <Minus className="w-4 h-4" />
+              </motion.button>
+              <span className="text-text text-lg font-bold w-10 text-center">
+                {quantity}
+              </span>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setQuantity(quantity + 1)}
+                aria-label="Miqdorni oshirish"
+                className="w-9 h-9 rounded-lg bg-gold hover:bg-gold-hover flex items-center justify-center shadow-sm hover:shadow-md transition-all"
+              >
+                <Plus className="w-4 h-4 text-white" />
+              </motion.button>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between pt-3 border-t border-border">
+            <span className="text-text-muted text-sm">Osh</span>
+            <div className="text-right">
+              <div className="text-text font-bold text-lg">{formatPrice(totalPrice)}</div>
+              <div className="text-text-muted text-xs flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                <span>{dish.cook_time_minutes} daqiqa</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <button
+        {/* Add to Cart Button */}
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
           onClick={handleAddToCart}
           disabled={!dish.is_available}
           aria-label={`${dish.name}ni savatga qo'shish`}
-          className="w-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed text-bg py-4 rounded-[var(--radius-btn)] transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
-          style={{
-            boxShadow: dish.is_available ? 'var(--shadow-gold)' : 'none'
-          }}
+          className="w-full bg-gold hover:bg-gold-hover disabled:bg-surface-2 disabled:cursor-not-allowed text-white py-4 rounded-lg transition-all flex items-center justify-center gap-2 font-semibold shadow-md hover:shadow-lg"
         >
-          <Plus className="w-5 h-5" />
-          <span>Savatga qo'shish • {formatPrice(totalPrice)}</span>
-        </button>
+          <span>Savatga qo'shish</span>
+        </motion.button>
       </div>
     </BottomSheet>
   )
