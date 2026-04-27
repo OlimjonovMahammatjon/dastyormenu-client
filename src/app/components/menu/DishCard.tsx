@@ -18,56 +18,53 @@ export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      whileHover={{ y: -4, boxShadow: '0 12px 28px rgba(245, 158, 11, 0.25)' }}
+      whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(245, 158, 11, 0.3)' }}
       className="bg-white rounded-xl overflow-hidden border-2 border-gray-100 hover:border-gold transition-all cursor-pointer group relative shadow-md"
       onClick={onClick}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-surface-2 to-surface">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         <ImageWithFallback
           src={dish.image_url}
           alt={dish.name}
           fallback="🍽️"
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
         {!dish.is_available && (
-          <div className="absolute inset-0 bg-bg/95 flex items-center justify-center">
+          <div className="absolute inset-0 bg-white/95 flex items-center justify-center">
             <div className="text-center">
-              <span className="text-text-muted text-sm px-6 py-3 bg-surface rounded-full border-2 border-border">
+              <span className="text-gray-600 text-sm px-6 py-3 bg-white rounded-lg border-2 border-gray-200 shadow-sm">
                 Vaqtinchalik mavjud emas
               </span>
             </div>
           </div>
         )}
         
-        {/* Badge for new items */}
+        {/* Badge for available items */}
         {dish.is_available && (
-          <div className="absolute top-3 right-3 bg-gold text-bg text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg">
+          <div className="absolute top-3 right-3 bg-gold text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
             Yangi
           </div>
         )}
       </div>
 
-      <div className="p-5">
-        <h3 className="text-text text-lg font-semibold mb-2 line-clamp-1 group-hover:text-gold transition-colors">
+      <div className="p-4">
+        <h3 className="text-gray-900 text-base font-bold mb-1.5 line-clamp-1 group-hover:text-gold transition-colors">
           {dish.name}
         </h3>
         
         {dish.description && (
-          <p className="text-text-muted text-sm mb-4 line-clamp-2 leading-relaxed">
+          <p className="text-gray-600 text-xs mb-3 line-clamp-2 leading-relaxed">
             {dish.description}
           </p>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-end justify-between">
           <div className="flex-1">
-            <div className="text-gold text-2xl font-bold mb-1">
+            <div className="text-gold text-xl font-bold mb-1">
               {formatPrice(dish.price)}
             </div>
-            <div className="flex items-center gap-1.5 text-text-muted text-xs">
+            <div className="flex items-center gap-1.5 text-gray-500 text-xs">
               <Clock className="w-3.5 h-3.5" />
               <span>{dish.cook_time_minutes} daqiqa</span>
             </div>
@@ -79,9 +76,9 @@ export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
             onClick={onAddToCart}
             disabled={!dish.is_available}
             aria-label={`${dish.name}ni savatga qo'shish`}
-            className="w-11 h-11 rounded-lg bg-gold hover:bg-gold-hover disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
+            className="w-12 h-12 rounded-xl bg-gold hover:bg-gold-hover disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
           >
-            <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
+            <Plus className="w-6 h-6 text-white" strokeWidth={3} />
           </motion.button>
         </div>
       </div>
