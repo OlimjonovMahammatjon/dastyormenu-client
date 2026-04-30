@@ -144,6 +144,19 @@ export function MenuPage() {
       return
     }
 
+    // Check if we have table data with qr_code_id
+    if (!table || !table.qr_code_id) {
+      toast.error('QR kod ma\'lumoti topilmadi. Iltimos, sahifani yangilang.', {
+        duration: 4000,
+        style: {
+          background: '#fee2e2',
+          color: '#991b1b',
+          border: '1px solid #fca5a5'
+        }
+      })
+      return
+    }
+
     try {
       const items = useCartStore.getState().items
       
@@ -154,9 +167,9 @@ export function MenuPage() {
         return
       }
 
-      // Prepare order data for API - backend requires all fields
+      // Prepare order data for API - backend requires qr_code_id
       const orderData = {
-        table_id: tableId,
+        qr_code_id: table.qr_code_id,
         customer_note: note && note.trim() ? note.trim() : "",
         tip_percentage: tipPercentage || 0,
         items: items.map(item => ({

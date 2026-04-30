@@ -18,6 +18,7 @@ async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> 
     console.log('🔵 API Request:', {
       url,
       method: options?.method || 'GET',
+      body: options?.body
     })
   }
 
@@ -59,6 +60,15 @@ async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> 
         }
       }
 
+      // Special handling for common errors
+      if (response.status === 502) {
+        throw new APIError(502, 'Server vaqtincha ishlamayapti. Iltimos, keyinroq urinib ko\'ring.', errorDetails)
+      }
+      
+      if (response.status === 503) {
+        throw new APIError(503, 'Server texnik xizmat ko\'rsatilmoqda. Iltimos, keyinroq urinib ko\'ring.', errorDetails)
+      }
+
       throw new APIError(response.status, errorMessage, errorDetails)
     }
 
@@ -78,7 +88,12 @@ async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> 
       console.error('🔴 Network Error:', error)
     }
     
-    throw new Error('Network error: Ma\'lumotlarni yuklashda xatolik yuz berdi')
+    // Check if it's a CORS error
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new Error('CORS xatosi: Backend server bilan bog\'lanishda muammo. Backend CORS sozlamalarini tekshiring.')
+    }
+    
+    throw new Error('Network error: Internet aloqasini tekshiring yoki keyinroq urinib ko\'ring.')
   }
 }
 
@@ -173,7 +188,7 @@ export const api = {
 
   // Create order
   async createOrder(orderData: {
-    table_id: string
+    qr_code_id: string
     customer_note: string
     tip_percentage: number
     items: Array<{
