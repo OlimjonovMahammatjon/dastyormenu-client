@@ -154,19 +154,20 @@ export function MenuPage() {
         return
       }
 
-      // Prepare order data for API
+      // Prepare order data for API - backend requires all fields
       const orderData = {
         table_id: tableId,
+        customer_note: note && note.trim() ? note.trim() : "",
+        tip_percentage: tipPercentage || 0,
         items: items.map(item => ({
           menu_item_id: item.menuItem.id,
           quantity: item.quantity,
-          modifications: item.modifications || undefined
-        })),
-        customer_note: note || undefined,
-        tip_percentage: tipPercentage
+          modifications: item.modifications && item.modifications.trim() ? item.modifications.trim() : "",
+          item_status: "pending"
+        }))
       }
 
-      console.log('📤 Sending order:', orderData)
+      console.log('📤 Sending order:', JSON.stringify(orderData, null, 2))
 
       // Create order via API
       const order = await api.createOrder(orderData)
@@ -196,10 +197,17 @@ export function MenuPage() {
       }, 1000)
     } catch (err: any) {
       console.error('❌ Error creating order:', err)
+      console.error('❌ Error details:', err.details)
       
       let errorMessage = 'Buyurtma yuborishda xatolik yuz berdi'
       
-      if (err.message) {
+      if (err.details) {
+        // Show detailed error from backend
+        const detailsStr = typeof err.details === 'object' 
+          ? JSON.stringify(err.details, null, 2) 
+          : String(err.details)
+        errorMessage = `Xatolik: ${detailsStr}`
+      } else if (err.message) {
         errorMessage = err.message
       }
       
@@ -208,7 +216,9 @@ export function MenuPage() {
         style: {
           background: '#fee2e2',
           color: '#991b1b',
-          border: '1px solid #fca5a5'
+          border: '1px solid #fca5a5',
+          fontSize: '12px',
+          maxWidth: '400px'
         }
       })
     }

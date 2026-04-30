@@ -174,14 +174,19 @@ export const api = {
   // Create order
   async createOrder(orderData: {
     table_id: string
+    customer_note: string
+    tip_percentage: number
     items: Array<{
       menu_item_id: string
       quantity: number
-      modifications?: string
+      modifications: string
+      item_status: string
     }>
-    customer_note?: string
-    tip_percentage: number
   }) {
+    if (DEBUG) {
+      console.log('📤 Order Data (sending):', JSON.stringify(orderData, null, 2))
+    }
+
     return fetchAPI('/orders/', {
       method: 'POST',
       body: JSON.stringify(orderData),
