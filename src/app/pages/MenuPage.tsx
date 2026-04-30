@@ -118,42 +118,60 @@ export function MenuPage() {
     for (let i = 0; i < quantity; i++) {
       addItem(dish, modifications)
     }
-    toast.success(`${dish.name} savatga qo'shildi`, {
+    
+    toast.success(`✅ ${dish.name} savatga qo'shildi`, {
+      duration: 2000,
       style: {
-        background: 'var(--surface)',
-        color: 'var(--text)',
-        border: '1px solid var(--border)'
-      },
-      iconTheme: {
-        primary: 'var(--gold)',
-        secondary: 'var(--bg)'
+        background: '#f0fdf4',
+        color: '#166534',
+        border: '1px solid #86efac',
+        fontSize: '14px',
+        fontWeight: '600'
       }
     })
   }
 
   const handleCheckout = async (tipPercentage: number, note?: string) => {
     if (!tableId) {
-      toast.error('Table ID topilmadi')
+      toast.error('Stol raqami topilmadi. Iltimos, QR kodni qayta skanerlang.', {
+        duration: 4000,
+        style: {
+          background: '#fee2e2',
+          color: '#991b1b',
+          border: '1px solid #fca5a5'
+        }
+      })
       return
     }
 
     try {
       const items = useCartStore.getState().items
       
+      if (items.length === 0) {
+        toast.error('Savatingiz bo\'sh', {
+          duration: 3000
+        })
+        return
+      }
+
       // Prepare order data for API
       const orderData = {
         table_id: tableId,
         items: items.map(item => ({
           menu_item_id: item.menuItem.id,
           quantity: item.quantity,
-          modifications: item.modifications
+          modifications: item.modifications || undefined
         })),
-        customer_note: note,
+        customer_note: note || undefined,
         tip_percentage: tipPercentage
       }
 
+      console.log('📤 Sending order:', orderData)
+
       // Create order via API
       const order = await api.createOrder(orderData)
+      
+      console.log('✅ Order created:', order)
       
       // Store order ID for tracking
       localStorage.setItem('currentOrderId', order.id)
@@ -161,28 +179,36 @@ export function MenuPage() {
       clearCart()
       setIsCartOpen(false)
 
-      toast.success('Buyurtma muvaffaqiyatli yuborildi!', {
+      toast.success('🎉 Buyurtma muvaffaqiyatli yuborildi!', {
+        duration: 3000,
         style: {
-          background: 'var(--surface)',
-          color: 'var(--text)',
-          border: '1px solid var(--gold)'
-        },
-        iconTheme: {
-          primary: 'var(--gold)',
-          secondary: 'var(--bg)'
+          background: '#f0fdf4',
+          color: '#166534',
+          border: '1px solid #86efac',
+          fontSize: '16px',
+          fontWeight: 'bold'
         }
       })
 
+      // Navigate to tracking page
       setTimeout(() => {
         navigate(`/${tableId}/tracking`)
-      }, 500)
-    } catch (err) {
-      console.error('Error creating order:', err)
-      toast.error('Buyurtma yuborishda xatolik yuz berdi', {
+      }, 1000)
+    } catch (err: any) {
+      console.error('❌ Error creating order:', err)
+      
+      let errorMessage = 'Buyurtma yuborishda xatolik yuz berdi'
+      
+      if (err.message) {
+        errorMessage = err.message
+      }
+      
+      toast.error(errorMessage, {
+        duration: 5000,
         style: {
-          background: 'var(--surface)',
-          color: 'var(--text)',
-          border: '1px solid var(--destructive)'
+          background: '#fee2e2',
+          color: '#991b1b',
+          border: '1px solid #fca5a5'
         }
       })
     }
