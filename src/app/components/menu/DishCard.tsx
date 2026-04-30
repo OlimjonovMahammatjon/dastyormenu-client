@@ -1,5 +1,5 @@
 import { MenuItem } from '../../../types'
-import { Clock, Plus } from 'lucide-react'
+import { Clock, Plus, Star } from 'lucide-react'
 import { motion } from 'motion/react'
 import { formatPrice } from '../../../lib/utils'
 import { ImageWithFallback } from '../figma/ImageWithFallback'
@@ -18,69 +18,84 @@ export function DishCard({ dish, onClick, onAddToCart }: DishCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(245, 158, 11, 0.3)' }}
-      className="bg-white rounded-xl overflow-hidden border-2 border-gray-100 hover:border-gold transition-all cursor-pointer group relative shadow-md"
+      whileHover={{ y: -4 }}
+      className="bg-white rounded-xl overflow-hidden cursor-pointer group relative transition-all border border-gray-200"
+      style={{
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+      }}
       onClick={onClick}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+      {/* Image Section */}
+      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
         <ImageWithFallback
           src={dish.image_url}
           alt={dish.name}
           fallback="🍽️"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         
         {!dish.is_available && (
-          <div className="absolute inset-0 bg-white/95 flex items-center justify-center">
+          <div className="absolute inset-0 bg-white/95 flex items-center justify-center backdrop-blur-sm">
             <div className="text-center">
-              <span className="text-gray-600 text-sm px-6 py-3 bg-white rounded-lg border-2 border-gray-200 shadow-sm">
+              <span className="text-gray-700 text-sm px-5 py-2.5 bg-white rounded-xl shadow-md font-semibold border border-gray-200">
                 Vaqtinchalik mavjud emas
               </span>
             </div>
           </div>
         )}
-        
-        {/* Badge for available items */}
+
+        {/* Rating Badge */}
         {dish.is_available && (
-          <div className="absolute top-3 right-3 bg-gold text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
-            Yangi
+          <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1 border border-gray-100">
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <span className="text-xs font-bold text-gray-900">4.8</span>
           </div>
         )}
       </div>
 
+      {/* Content Section */}
       <div className="p-4">
-        <h3 className="text-gray-900 text-base font-bold mb-1.5 line-clamp-1 group-hover:text-gold transition-colors">
+        {/* Title */}
+        <h3 className="text-gray-900 text-base font-bold mb-1.5 line-clamp-1 leading-tight">
           {dish.name}
         </h3>
         
+        {/* Description */}
         {dish.description && (
-          <p className="text-gray-600 text-xs mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-gray-500 text-xs mb-3 line-clamp-2 leading-relaxed">
             {dish.description}
           </p>
         )}
 
-        <div className="flex items-end justify-between">
-          <div className="flex-1">
-            <div className="text-gold text-xl font-bold mb-1">
-              {formatPrice(dish.price)}
-            </div>
-            <div className="flex items-center gap-1.5 text-gray-500 text-xs">
-              <Clock className="w-3.5 h-3.5" />
-              <span>{dish.cook_time_minutes} daqiqa</span>
-            </div>
+        {/* Price and Time Row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-gray-900 text-xl font-bold">
+            {formatPrice(dish.price)}
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={onAddToCart}
-            disabled={!dish.is_available}
-            aria-label={`${dish.name}ni savatga qo'shish`}
-            className="w-12 h-12 rounded-xl bg-gold hover:bg-gold-hover disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
-          >
-            <Plus className="w-6 h-6 text-white" strokeWidth={3} />
-          </motion.button>
+          <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+            <Clock className="w-3.5 h-3.5" />
+            <span className="font-medium">{dish.cook_time_minutes} daqiqa</span>
+          </div>
         </div>
+
+        {/* Add to Cart Button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onAddToCart}
+          disabled={!dish.is_available}
+          aria-label={`${dish.name}ni savatga qo'shish`}
+          className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed border-2"
+          style={{
+            backgroundColor: dish.is_available ? '#f59e0b' : '#e5e7eb',
+            borderColor: dish.is_available ? '#f59e0b' : '#d1d5db',
+            color: 'white',
+            boxShadow: dish.is_available ? '0 4px 12px rgba(245, 158, 11, 0.3)' : 'none'
+          }}
+        >
+          <Plus className="w-5 h-5" strokeWidth={2.5} />
+          <span>Savatga qo'shish</span>
+        </motion.button>
       </div>
     </motion.div>
   )

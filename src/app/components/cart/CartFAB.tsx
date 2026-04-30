@@ -18,23 +18,26 @@ export function CartFAB({ onClick }: CartFABProps) {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 100, opacity: 0 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
       aria-label={`Savat: ${itemCount} ta mahsulot, jami ${formatPrice(total)}`}
-      className="fixed bottom-6 left-4 right-4 max-w-[448px] mx-auto bg-white hover:bg-gray-50 text-text rounded-xl px-5 py-3.5 flex items-center justify-between shadow-2xl z-30 transition-all hover:shadow-3xl border-2 border-gold"
+      className="fixed bottom-6 left-4 right-4 max-w-[480px] mx-auto rounded-2xl px-6 py-4 flex items-center justify-between z-30 transition-all shadow-2xl"
       style={{
-        boxShadow: '0 10px 40px rgba(245, 158, 11, 0.3)'
+        backgroundColor: '#f59e0b',
+        boxShadow: '0 10px 40px rgba(245, 158, 11, 0.4)'
       }}
     >
       <div className="flex items-center gap-3">
-        <div className="relative bg-gold rounded-lg p-2">
-          <ShoppingBag className="w-5 h-5 text-white" aria-hidden="true" />
-          <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md" aria-hidden="true">
+        <div className="relative bg-white/20 backdrop-blur-sm rounded-xl p-2.5">
+          <ShoppingBag className="w-6 h-6 text-white" aria-hidden="true" strokeWidth={2.5} />
+          <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg" aria-hidden="true">
             {itemCount}
           </div>
         </div>
-        <span className="font-semibold text-text">Savatni ko'rish</span>
+        <span className="font-bold text-white text-base">Savatni ko'rish</span>
       </div>
-      <div className="text-xl font-bold text-gold">{formatPrice(total)}</div>
+      <div className="text-2xl font-bold text-white">{formatPrice(total)}</div>
     </motion.button>
   )
 }
